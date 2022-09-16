@@ -1,3 +1,11 @@
 :root {
-    --button-size: 30px;
+    --button-size: 50px;
+    --dark-color: #505050;
+    --light-color: #D4D4D2;
+    --highlight-color: #FF9500;
+    --background-color: black;
+}
+
+body {
+    font-family: 'Helvetica';
 }
