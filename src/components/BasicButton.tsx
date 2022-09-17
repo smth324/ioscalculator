@@ -7,7 +7,11 @@ interface Props {
     length?: string
     textColor?: string
     onClick?: () => void
-    display: Dispatch<SetStateAction<string>>
+    display: Dispatch<SetStateAction<string>>,
+    type?: string,
+    setCurrentOperation?: Dispatch<SetStateAction<string>>,
+    currentOperation: string,
+    setSecondState: Dispatch<SetStateAction<string>>
 }
 interface styledProps {
     color: string
@@ -24,26 +28,8 @@ const Button = styled.button<styledProps>`
     height: var(--button-size);
     border-radius: var(--button-size);
     cursor: pointer;
-    color: ${props => {
-        switch (props.textColor) {
-            case 'white':
-                return 'white'
-            case 'black':
-                return 'black'
-            default:
-                return 'white'
-        }
-    }};
-    width: ${props => {
-        switch (props.length) {
-            case 'small':
-                return 'var(--button-size)'
-            case 'medium':
-                return '90px'
-            default:
-                return 'var(--button-size)'
-        }
-    }};
+    color: ${props => props.textColor || 'white'};
+    width: ${props => props.length === 'medium' ? '90px' : 'var(--button-size)'};
     border-color: ${props => {
         switch (props.color) {
             case 'dark':
@@ -70,10 +56,25 @@ const Button = styled.button<styledProps>`
     }};
 `
 
-const BasicButton: React.FC<Props> = ({ label, color, length, textColor, onClick, display }) => {
+const BasicButton: React.FC<Props> = ({ currentOperation, setSecondState, label, color, length, textColor, setCurrentOperation, onClick, display, type }) => {
     const handleClick = () => {
+        if (!type) {
+            if (currentOperation !== '') {
+                setSecondState((state) => {
+                    if (state.length === 9) return state
+                    return state === '0' ? label : state.concat(label)
+                })
+                return
+            }
+            display((state) => {
+                if (state.length === 9) return state
+                return state === '0' ? label : state.concat(label)
+            })
+        }
+        if (type === 'operation' && setCurrentOperation && label !== '=') {
+            setCurrentOperation(label)
+        }
         onClick && onClick();
-        (label === 'AC' || label === 'C') || display((state) => (state === '0' || state === 'C') ? label : state.concat(label))
     }
     return (
         <Button color={color} length={length} textColor={textColor} onClick={handleClick}>

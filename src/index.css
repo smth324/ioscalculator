@@ -8,4 +8,6 @@
 
 body {
     font-family: 'Helvetica';
+    display: flex;
+    justify-content: center;
 }
