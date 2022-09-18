@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import styled from 'styled-components';
 import BasicButton from './components/BasicButton';
 
@@ -26,66 +26,121 @@ const Display = styled.div<styledProps>`
 `
 
 const App = () => {
-  const [state, setState] = useState('0')
-  const [secondState, setSecondState] = useState('0')
+  const [state, setState] = useState('')
+  const [secondState, setSecondState] = useState('')
   const [currentOperation, setCurrentOperation] = useState('')
+  const [display, setDisplay] = useState('0')
+  const [first, setFirst] = useState(true)
 
-  useEffect(() => {
-    document.body.addEventListener('keydown', (event) => console.log(event.code))
 
-    return function cleanup() {
-      window.removeEventListener('keydown', (event) => console.log(event.code))
+  const handleClear = () => {
+    setState('0')
+    setSecondState('0')
+    setDisplay('0')
+    setFirst(true)
+    setCurrentOperation('')
+  }
+  const handleEquals = (label: string) => {
+    let secondFactor = Number(secondState)
+    let firstFactor = Number(state)
+    if (secondState === '') {
+      setSecondState(state)
+      secondFactor = Number(state)
     }
-  }, [])
-  const handleEquals = () => {
-    if (currentOperation === '×') {
-      setState(String(Number(state) * Number(secondState)))
+    if (state === '') {
+      firstFactor = Number(display)
+    }
+    let newState = state
+    if (label === '+/-') {
+      newState = String(0 - firstFactor)
+    } else if (label === '%') {
+      newState = String(firstFactor / 100)
       setSecondState('0')
+    } else if (currentOperation === '×') {
+      newState = String(firstFactor * secondFactor)
+    } else if (currentOperation === '+') {
+      newState = String(firstFactor + secondFactor)
+    } else if (currentOperation === '÷') {
+      newState = String(firstFactor / secondFactor)
+    } else if (currentOperation === '−') {
+      newState = String(firstFactor - secondFactor)
+    }
+    setState('')
+    setFirst(true)
+    setDisplay(newState)
+  }
+  const handleNumberClick = useCallback((label: string) => {
+    if (!first) {
+      setSecondState((state) => {
+        if (state.length === 9) return state
+        const toReturn = state === '0' ? label : state.concat(label)
+        setDisplay(toReturn)
+        return toReturn
+      })
       return
     }
-    if (currentOperation === '+') {
-      setState(String(Number(state) + Number(secondState)))
-      setSecondState('0')
-      return
-    }
-    if (currentOperation === '÷') {
-      setState(String(Number(state) / Number(secondState)))
-      setSecondState('0')
-      return
-    }
-    if (currentOperation === '−') {
-      setState(String(Number(state) - Number(secondState)))
-      setSecondState('0')
-      return
+    setState((state) => {
+      if (state.length === 9) return state
+      const toReturn = state.concat(label)
+      setDisplay(toReturn)
+      return toReturn
+    })
+  },[first])
+  const handleOperationClick = (label: string) => {
+    if (label !== '=') {
+      setFirst(false)
+      setSecondState('')
+      setState(display)
+      setCurrentOperation(label)
     }
   }
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      console.log('press')
+      if (!isNaN(Number(event.key))) {
+        handleNumberClick(event.key)
+      }
+    }
+    console.log('asd')
+    document.body.addEventListener('keydown', (event) => handleKeyDown(event))
+    return function cleanup() {
+      console.log('clean')
+      document.body.removeEventListener('keydown', (event) => handleKeyDown(event))
+    }
+  },[handleNumberClick])
   return (
     <Container>
-      <Display displayLength={secondState === '0' ? state.length : secondState.length}>{Number(secondState === "0" ? state : secondState).toLocaleString()}</Display>
+      <Display displayLength={display.length}>{Number(display).toLocaleString()}</Display>
       <div>
-        <BasicButton setSecondState={setSecondState} currentOperation={currentOperation} setCurrentOperation={setCurrentOperation} type="operation" display={setState} label={state === '0' ? 'AC' : 'C'} color='light' textColor='black' onClick={() => setState('0')} />
-        <BasicButton setSecondState={setSecondState} currentOperation={currentOperation} setCurrentOperation={setCurrentOperation} type="operation" display={setState} label='+/-' color='light' textColor='black' />
-        <BasicButton setSecondState={setSecondState} currentOperation={currentOperation} setCurrentOperation={setCurrentOperation} type="operation" display={setState} label='%' color='light' textColor='black' />
-        <BasicButton setSecondState={setSecondState} currentOperation={currentOperation} setCurrentOperation={setCurrentOperation} type="operation" display={setState} label='÷' color='highlight' />
+        <BasicButton currentOperation={currentOperation} label={state === '0' ? 'AC' : 'C'} color='light' textColor='black' onClick={handleClear} />
+        <BasicButton currentOperation={currentOperation} label='+/-' color='light' textColor='black' onClick={(label) => {
+          handleOperationClick(label)
+          handleEquals(label)
+        }} />
+        <BasicButton currentOperation={currentOperation} label='%' color='light' textColor='black' onClick={(label) => {
+          handleOperationClick(label)
+          handleEquals(label)
+        }} />
+        <BasicButton currentOperation={currentOperation} label='÷' color='highlight' onClick={handleOperationClick} />
 
-        <BasicButton setSecondState={setSecondState} currentOperation={currentOperation} display={setState} label='7' color='black' />
-        <BasicButton setSecondState={setSecondState} currentOperation={currentOperation} display={setState} label='8' color='black' />
-        <BasicButton setSecondState={setSecondState} currentOperation={currentOperation} display={setState} label='9' color='black' />
-        <BasicButton setSecondState={setSecondState} currentOperation={currentOperation} setCurrentOperation={setCurrentOperation} type="operation" display={setState} label='×' color='highlight' />
+        <BasicButton currentOperation={currentOperation} label='7' color='black' onClick={handleNumberClick} />
+        <BasicButton currentOperation={currentOperation} label='8' color='black' onClick={handleNumberClick} />
+        <BasicButton currentOperation={currentOperation} label='9' color='black' onClick={handleNumberClick} />
+        <BasicButton currentOperation={currentOperation} label='×' color='highlight' onClick={handleOperationClick} />
 
-        <BasicButton setSecondState={setSecondState} currentOperation={currentOperation} display={setState} label='4' color='black' />
-        <BasicButton setSecondState={setSecondState} currentOperation={currentOperation} display={setState} label='5' color='black' />
-        <BasicButton setSecondState={setSecondState} currentOperation={currentOperation} display={setState} label='6' color='black' />
-        <BasicButton setSecondState={setSecondState} currentOperation={currentOperation} setCurrentOperation={setCurrentOperation} type="operation" display={setState} label='−' color='highlight' />
+        <BasicButton currentOperation={currentOperation} label='4' color='black' onClick={handleNumberClick} />
+        <BasicButton currentOperation={currentOperation} label='5' color='black' onClick={handleNumberClick} />
+        <BasicButton currentOperation={currentOperation} label='6' color='black' onClick={handleNumberClick} />
+        <BasicButton currentOperation={currentOperation} label='−' color='highlight' onClick={handleOperationClick} />
 
-        <BasicButton setSecondState={setSecondState} currentOperation={currentOperation} display={setState} label='1' color='black' />
-        <BasicButton setSecondState={setSecondState} currentOperation={currentOperation} display={setState} label='2' color='black' />
-        <BasicButton setSecondState={setSecondState} currentOperation={currentOperation} display={setState} label='3' color='black' />
-        <BasicButton setSecondState={setSecondState} currentOperation={currentOperation} setCurrentOperation={setCurrentOperation} type="operation" display={setState} label='+' color='highlight' />
+        <BasicButton currentOperation={currentOperation} label='1' color='black' onClick={handleNumberClick} />
+        <BasicButton currentOperation={currentOperation} label='2' color='black' onClick={handleNumberClick} />
+        <BasicButton currentOperation={currentOperation} label='3' color='black' onClick={handleNumberClick} />
+        <BasicButton currentOperation={currentOperation} label='+' color='highlight' onClick={handleOperationClick} />
 
-        <BasicButton setSecondState={setSecondState} currentOperation={currentOperation} display={setState} label='0' color='black' length='medium' />
-        <BasicButton setSecondState={setSecondState} currentOperation={currentOperation} display={setState} label='.' color='black' />
-        <BasicButton setSecondState={setSecondState} currentOperation={currentOperation} setCurrentOperation={setCurrentOperation} type="operation" display={setState} label='=' color='highlight' onClick={handleEquals} />
+        <BasicButton currentOperation={currentOperation} label='0' color='black' onClick={handleNumberClick} length='medium' />
+        <BasicButton currentOperation={currentOperation} label='.' color='black' onClick={handleNumberClick} />
+        <BasicButton currentOperation={currentOperation} label='=' color='highlight' onClick={handleEquals} />
       </div>
     </Container>
   )
