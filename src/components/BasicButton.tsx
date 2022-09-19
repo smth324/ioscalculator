@@ -1,4 +1,4 @@
-import React from "react"
+import React, { useState } from "react"
 import styled from "styled-components"
 
 interface Props {
@@ -27,18 +27,6 @@ const Button = styled.button<styledProps>`
     cursor: pointer;
     color: ${props => props.selected ? 'var(--highlight-color)' : (props.textColor || 'white')};
     width: ${props => props.length === 'medium' ? '90px' : 'var(--button-size)'};
-    border-color: ${props => {
-        switch (props.color) {
-            case 'dark':
-                return 'var(--dark-color)'
-            case 'light':
-                return 'var(--light-color)'
-            case 'highlight':
-                return 'var(--highlight-color)'
-            default:
-                return 'var(--dark-color)'
-        }
-    }};
     background-color: ${props => {
         if (props.selected) return 'white'
         switch (props.color) {
@@ -48,18 +36,34 @@ const Button = styled.button<styledProps>`
                 return 'var(--light-color)'
             case 'highlight':
                 return 'var(--highlight-color)'
+            case 'white':
+                return 'white'
             default:
                 return 'var(--dark-color)'
         }
     }};
+    transition: background-color 0.35s;
 `
 
 const BasicButton: React.FC<Props> = ({ currentOperation, label, color, length, textColor, onClick, }) => {
+    const [passedColor, setPassedColor] = useState(color)
     const handleClick = () => {
         onClick && onClick(label)
+        if (label === currentOperation) return
+        if (label === '+/-' || label === '%' || label === 'AC' || label === 'C') {
+            setPassedColor('white')
+            setTimeout(() => {
+                setPassedColor(color)
+            }, 150)
+            return
+        }
+        setPassedColor('light')
+        setTimeout(() => {
+            setPassedColor(color)
+        }, 150)
     }
     return (
-        <Button color={color} length={length} textColor={textColor} onClick={handleClick} selected={label === currentOperation}>
+        <Button color={passedColor} length={length} textColor={textColor} onClick={handleClick} selected={label === currentOperation}>
             {label}
         </Button>
     )

@@ -32,7 +32,6 @@ const App = () => {
   const [display, setDisplay] = useState('0')
   const [first, setFirst] = useState(true)
 
-
   const handleClear = () => {
     setState('0')
     setSecondState('0')
@@ -40,7 +39,7 @@ const App = () => {
     setFirst(true)
     setCurrentOperation('')
   }
-  const handleEquals = (label: string) => {
+  const handleEquals = useCallback((label: string) => {
     let secondFactor = Number(secondState)
     let firstFactor = Number(state)
     if (secondState === '') {
@@ -68,7 +67,7 @@ const App = () => {
     setState('')
     setFirst(true)
     setDisplay(newState)
-  }
+  }, [currentOperation, display, secondState, state])
   const handleNumberClick = useCallback((label: string) => {
     if (!first) {
       setSecondState((state) => {
@@ -85,42 +84,51 @@ const App = () => {
       setDisplay(toReturn)
       return toReturn
     })
-  },[first])
-  const handleOperationClick = (label: string) => {
-    if (label !== '=') {
+  }, [first])
+  const handleOperationClick = useCallback((label: string) => {
+    if (!(label === '=' || label === '+/-' || label === '%')) {
       setFirst(false)
       setSecondState('')
       setState(display)
       setCurrentOperation(label)
     }
-  }
+  }, [display])
+
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
-      console.log('press')
       if (!isNaN(Number(event.key))) {
         handleNumberClick(event.key)
+        return
+      }
+      if (event.key === '+') {
+        handleOperationClick('+')
+      }
+      if (event.key === '/') {
+        handleOperationClick('÷')
+      }
+      if (event.key === '-') {
+        handleOperationClick('−')
+      }
+      if (event.key === '*') {
+        handleOperationClick('×')
+      }
+      if (event.key === 'Enter') {
+        handleEquals('=')
       }
     }
-    console.log('asd')
-    document.body.addEventListener('keydown', (event) => handleKeyDown(event))
-    return function cleanup() {
-      console.log('clean')
-      document.body.removeEventListener('keydown', (event) => handleKeyDown(event))
+    window.addEventListener('keydown', handleKeyDown)
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown)
     }
-  },[handleNumberClick])
+  }, [handleNumberClick, handleOperationClick, handleEquals])
+
   return (
     <Container>
-      <Display displayLength={display.length}>{Number(display).toLocaleString()}</Display>
+      <Display displayLength={Number(display).toLocaleString().length}>{Number(display).toLocaleString()}</Display>
       <div>
         <BasicButton currentOperation={currentOperation} label={state === '0' ? 'AC' : 'C'} color='light' textColor='black' onClick={handleClear} />
-        <BasicButton currentOperation={currentOperation} label='+/-' color='light' textColor='black' onClick={(label) => {
-          handleOperationClick(label)
-          handleEquals(label)
-        }} />
-        <BasicButton currentOperation={currentOperation} label='%' color='light' textColor='black' onClick={(label) => {
-          handleOperationClick(label)
-          handleEquals(label)
-        }} />
+        <BasicButton currentOperation={currentOperation} label='+/-' color='light' textColor='black' onClick={(label) => { handleOperationClick(label); handleEquals(label) }} />
+        <BasicButton currentOperation={currentOperation} label='%' color='light' textColor='black' onClick={(label) => { handleOperationClick(label); handleEquals(label) }} />
         <BasicButton currentOperation={currentOperation} label='÷' color='highlight' onClick={handleOperationClick} />
 
         <BasicButton currentOperation={currentOperation} label='7' color='black' onClick={handleNumberClick} />
