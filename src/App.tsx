@@ -1,11 +1,19 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import styled from 'styled-components';
 import BasicButton from './components/BasicButton';
+import History from './components/History';
 
 const Container = styled.div`
     background-color: var(--background-color);
     width: 240px;
     padding: 5px;
+`
+
+const ShowHistoryBtn = styled.button`
+  all:unset; 
+  color: white;
+  cursor: pointer;
+  float: right;
 `
 
 interface styledProps {
@@ -31,6 +39,8 @@ const App = () => {
   const [currentOperation, setCurrentOperation] = useState('')
   const [display, setDisplay] = useState('0')
   const [first, setFirst] = useState(true)
+  const [history, setHistory] = useState<string[]>([])
+  const [show, setShow] = useState(false)
 
   const handleClear = () => {
     setState('0')
@@ -52,17 +62,23 @@ const App = () => {
     let newState = state
     if (label === '+/-') {
       newState = String(0 - firstFactor)
+      setHistory((history) => history.concat(`${firstFactor}+/-=${newState}`))
     } else if (label === '%') {
       newState = String(firstFactor / 100)
       setSecondState('0')
+      setHistory((history) => history.concat(`${firstFactor}%=${newState}`))
     } else if (currentOperation === '×') {
       newState = String(firstFactor * secondFactor)
+      setHistory((history) => history.concat(`${firstFactor}${currentOperation}${secondFactor}=${newState}`))
     } else if (currentOperation === '+') {
       newState = String(firstFactor + secondFactor)
+      setHistory((history) => history.concat(`${firstFactor}${currentOperation}${secondFactor}=${newState}`))
     } else if (currentOperation === '÷') {
       newState = String(firstFactor / secondFactor)
+      setHistory((history) => history.concat(`${firstFactor}${currentOperation}${secondFactor}=${newState}`))
     } else if (currentOperation === '−') {
       newState = String(firstFactor - secondFactor)
+      setHistory((history) => history.concat(`${firstFactor}${currentOperation}${secondFactor}=${newState}`))
     }
     setState('')
     setFirst(true)
@@ -124,6 +140,7 @@ const App = () => {
 
   return (
     <Container>
+      {show ? <History setShow={setShow} history={history} /> : <ShowHistoryBtn onClick={() => setShow(true)}>History</ShowHistoryBtn>}
       <Display displayLength={Number(display).toLocaleString().length}>{Number(display).toLocaleString()}</Display>
       <div>
         <BasicButton currentOperation={currentOperation} label={state === '0' ? 'AC' : 'C'} color='light' textColor='black' onClick={handleClear} />
