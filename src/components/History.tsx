@@ -4,6 +4,7 @@ import styled from "styled-components"
 interface Props {
     history: string[]
     setShow: (boolean: boolean) => void
+    handleHistoryClick: (answer: string) => void
 }
 
 const Container = styled.div`
@@ -14,8 +15,8 @@ const Container = styled.div`
     position: absolute;
     max-height: 425px;
     overflow-y:scroll;
-    top: 8px;
-    left: 461px;
+    top: 0px;
+    left: 0px;
     background-color: black;
 `
 const Cell = styled.div`
@@ -23,8 +24,8 @@ const Cell = styled.div`
     padding: 20px 5px;
     text-align: right;
     background-color: black;
-    border-top: 0.3px solid white;
-    border-bottom: 0.3px solid white;
+    border-bottom: 0.6px solid white;
+    cursor: pointer;
 `
 
 const HideHistoryBtn = styled.button`
@@ -37,12 +38,15 @@ const HideHistoryBtn = styled.button`
     position: fixed;
 `
 
-const History: React.FC<Props> = ({ history, setShow }) => {
+const History: React.FC<Props> = ({ history, setShow, handleHistoryClick }) => {
+    const handleClick = (answer: string) => {
+        handleHistoryClick(answer.split('=')[1])
+    }
     return (
         <Container>
             <HideHistoryBtn onClick={() => setShow(false)}>X</HideHistoryBtn>
-            {history.map(x => (
-                <Cell>
+            {[...history].reverse().map((x, i) => (
+                <Cell onClick={() => handleClick(x)} key={x + i}>
                     {x}
                 </Cell>
             ))}

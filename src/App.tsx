@@ -7,15 +7,14 @@ const Container = styled.div`
     background-color: var(--background-color);
     width: 240px;
     padding: 5px;
+    position: relative;
 `
-
 const ShowHistoryBtn = styled.button`
   all:unset; 
   color: white;
   cursor: pointer;
   float: right;
 `
-
 interface styledProps {
   displayLength: number
 }
@@ -138,9 +137,17 @@ const App = () => {
     }
   }, [handleNumberClick, handleOperationClick, handleEquals])
 
+  const handleHistoryClick = (answer: string) => {
+    setState(answer)
+    setDisplay(answer)
+    setSecondState('')
+    setShow(false)
+    setFirst(true)
+    setCurrentOperation('')
+  }
   return (
     <Container>
-      {show ? <History setShow={setShow} history={history} /> : <ShowHistoryBtn onClick={() => setShow(true)}>History</ShowHistoryBtn>}
+      {show ? <History setShow={setShow} history={history} handleHistoryClick={handleHistoryClick} /> : <ShowHistoryBtn onClick={() => setShow(true)}>History</ShowHistoryBtn>}
       <Display displayLength={Number(display).toLocaleString().length}>{Number(display).toLocaleString()}</Display>
       <div>
         <BasicButton currentOperation={currentOperation} label={state === '0' ? 'AC' : 'C'} color='light' textColor='black' onClick={handleClear} />
