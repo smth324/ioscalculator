@@ -1,15 +1,15 @@
 {
   "files": {
-    "main.css": "/ioscalculator/static/css/main.c8ceadb6.css",
-    "main.js": "/ioscalculator/static/js/main.e4492845.js",
+    "main.css": "/ioscalculator/static/css/main.1f00ad9f.css",
+    "main.js": "/ioscalculator/static/js/main.fe771149.js",
     "static/js/787.eceeaea8.chunk.js": "/ioscalculator/static/js/787.eceeaea8.chunk.js",
     "index.html": "/ioscalculator/index.html",
-    "main.c8ceadb6.css.map": "/ioscalculator/static/css/main.c8ceadb6.css.map",
-    "main.e4492845.js.map": "/ioscalculator/static/js/main.e4492845.js.map",
+    "main.1f00ad9f.css.map": "/ioscalculator/static/css/main.1f00ad9f.css.map",
+    "main.fe771149.js.map": "/ioscalculator/static/js/main.fe771149.js.map",
     "787.eceeaea8.chunk.js.map": "/ioscalculator/static/js/787.eceeaea8.chunk.js.map"
   },
   "entrypoints": [
-    "static/css/main.c8ceadb6.css",
-    "static/js/main.e4492845.js"
+    "static/css/main.1f00ad9f.css",
+    "static/js/main.fe771149.js"
   ]
 }
