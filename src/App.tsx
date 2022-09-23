@@ -30,6 +30,16 @@ const Display = styled.div<styledProps>`
     return `${65 - ((props.displayLength - 5) * 6)}px`
   }};
   color: white;
+  overflow-x: auto;
+    overflow-y: hidden;
+    &::-webkit-scrollbar {
+    height: 5px;
+    background-color: black;
+}
+    &::-webkit-scrollbar-thumb {
+    background-color: #505050;
+    border-radius: 5px;
+}
 `
 
 const App = () => {
