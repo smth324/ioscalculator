@@ -23,7 +23,7 @@ const Display = styled.div<DisplayStyledProps>`
   width: 100%;
   margin-top: 50px;
   height: 65px;
-  text-align: ${(props) => (props.displayLength > 7 ? "end" : "center")};
+  text-align: ${(props) => (props.displayLength > 7 ? "center" : "end")};
   font-size: ${(props) => {
     if (props.displayLength < 6) {
       return "65px";
